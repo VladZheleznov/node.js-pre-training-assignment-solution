@@ -1,9 +1,14 @@
-import { addTodo, updateTodo, removeTodo, getTodo } from '../JS-TS/solutions/todo-crud';
+import {
+  addTodo,
+  updateTodo,
+  removeTodo,
+  getTodo,
+} from '../JS-TS/solutions/todo-crud';
 import { createTodo } from '../JS-TS/solutions/todo-factory';
-import { TodoStatus } from '../JS-TS/solutions/types';
+import { Todo, TodoStatus } from '../JS-TS/solutions/types';
 
 describe('Task 04: CRUD operations', () => {
-  const base = [];
+  const base: Todo[] = [];
   const todo = createTodo({ title: 'X' });
 
   it('addTodo should add item immutably', () => {
@@ -15,7 +20,9 @@ describe('Task 04: CRUD operations', () => {
   it('updateTodo should update fields immutably', () => {
     const list = addTodo(base, todo);
     const updated = updateTodo(list, todo.id, { status: TodoStatus.COMPLETED });
-    expect(updated.find((t) => t.id === todo.id)!.status).toBe(TodoStatus.COMPLETED);
+    expect(updated.find((t) => t.id === todo.id)!.status).toBe(
+      TodoStatus.COMPLETED
+    );
     expect(list.find((t) => t.id === todo.id)!.status).toBe(TodoStatus.PENDING);
   });
 
