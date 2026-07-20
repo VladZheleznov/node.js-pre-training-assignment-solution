@@ -3,22 +3,28 @@ export class InMemoryRepository<T extends { id: number }> {
   private items: T[] = [];
 
   add(entity: T): T {
-    throw new Error('add: not implemented');
+    this.items.push(entity);
+    return entity;
   }
 
   update(id: number, patch: Partial<T>): T {
-    throw new Error('update: not implemented');
+    this.items.forEach((item, index) => {
+      if (item.id === id) {
+        this.items[index] = { ...item, ...patch };
+      }
+    });
+    return this.items.find((item) => item.id === id)!;
   }
 
   remove(id: number): void {
-    throw new Error('remove: not implemented');
+    this.items = this.items.filter((item) => item.id !== id);
   }
 
-  findById(id: number): T | undefined {
-    throw new Error('findById: not implemented');
+  findById(id: number): T {
+    return this.items.find((item) => item.id === id)!;
   }
 
   findAll(): T[] {
-    throw new Error('findAll: not implemented');
+    return this.items;
   }
 }
