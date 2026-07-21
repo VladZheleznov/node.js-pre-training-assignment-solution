@@ -9,14 +9,19 @@ export class TodoNotFoundError extends Error {
 
 export class TodoApi {
   private repo = new InMemoryRepository<Todo>();
+  private delay: number = 500;
+
+  private async simulateDelay() {
+    await new Promise((resolve) => setTimeout(resolve, this.delay));
+  }
 
   async getAll(): Promise<Todo[]> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await this.simulateDelay();
     return this.repo.findAll();
   }
 
   async add(newTodo: NewTodo): Promise<Todo> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await this.simulateDelay();
     return this.repo.add({
       ...newTodo,
       id: Date.now(),
@@ -28,7 +33,7 @@ export class TodoApi {
     id: number,
     update: Partial<Omit<Todo, 'id' | 'createdAt'>>
   ): Promise<Todo> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await this.simulateDelay();
     if (!this.repo.findById(id)) {
       throw new TodoNotFoundError(id);
     }
@@ -36,7 +41,7 @@ export class TodoApi {
   }
 
   async remove(id: number): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await this.simulateDelay();
     if (!this.repo.findById(id)) {
       throw new TodoNotFoundError(id);
     }
