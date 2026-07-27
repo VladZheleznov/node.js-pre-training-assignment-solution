@@ -1,4 +1,5 @@
 import { InMemoryRepository } from './repository';
+import { createTodo } from './todo-factory';
 import { Todo, NewTodo } from './types';
 
 export class TodoNotFoundError extends Error {
@@ -8,7 +9,7 @@ export class TodoNotFoundError extends Error {
 }
 
 export class TodoApi {
-  private repo = new InMemoryRepository<Todo>();
+  constructor(private repo = new InMemoryRepository<Todo>()) {}
   private delay: number = 500;
 
   private async simulateDelay() {
@@ -22,11 +23,7 @@ export class TodoApi {
 
   async add(newTodo: NewTodo): Promise<Todo> {
     await this.simulateDelay();
-    return this.repo.add({
-      ...newTodo,
-      id: Date.now(),
-      createdAt: new Date(),
-    });
+    return this.repo.add(createTodo(newTodo));
   }
 
   async update(
