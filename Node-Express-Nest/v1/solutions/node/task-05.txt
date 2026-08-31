@@ -1,0 +1,68 @@
+Implementation Description
+The event-driven architecture is built on top of Node.js's 
+built-in EventEmitter class. The TodoServer inherits directly 
+from EventEmitter, allowing it to decouple core CRUD execution 
+from logging, analytics tracking, and historical event tracking.
+
+Triggered Events: Key actions throughout the server lifecycle 
+emit specific payloads containing timestamps and HTTP request 
+metadata (method, url, userAgent, ip).
+
+todoCreated, todoUpdated, todoDeleted, todoViewed, todosListed
+
+todoNotFound, validationError, serverError
+
+Decoupled Listeners: Listeners are wired via _wireDefaultListeners(). 
+Each emitted event can trigger multiple independent actions 
+simultaneously without cluttering the route handlers:
+
+Memory Storage: Appends the event payload to an in-memory history 
+ring buffer (recentEvents) capped at a maximum of 100 entries.
+
+Console Logging: Hands off data to the ConsoleLogger utility for 
+formatted CLI output.
+
+Analytics Increment: Triggers metric counters in the AnalyticsTracker.
+
+
+How analytics and logging were implemented:
+Analytics (AnalyticsTracker)
+Maintains global operation tallies (totalCreated, totalUpdated, 
+totalDeleted, totalViews, errors) and a rolling daily statistics 
+ledger (dailyStats).
+
+The _bumpDaily(field) helper isolates the current date key 
+(YYYY-MM-DD), initializes a daily metrics block if it doesn't 
+already exist, and safely increments the relevant counter.
+
+Exposed via the new GET /analytics endpoint to return JSON performance telemetry.
+
+Logging (ConsoleLogger)
+Provides structured CLI outputs.
+
+Handles event-specific extraction (e.g., pulling changed properties 
+from todoUpdated or error messages from serverError) to ensure concise 
+and informative diagnostic output.
+
+
+How to Run the solution:
+
+To test the automated test suite:
+
+node task-05-test.js
+
+To test manually using curl:
+
+node task-05.js
+
+# Get all todos and trigger todosListed
+curl http://localhost:3000/todos
+
+# Create a new Todo and trigger todoCreated
+curl -X POST http://localhost:3000/todos -H "Content-Type: application/json" -d '{"title":"Emit Test"}'
+
+# Get analytics data
+curl http://localhost:3000/analytics
+
+# Get the last 5 historical events
+curl http://localhost:3000/events?last=5
