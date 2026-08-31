@@ -1,0 +1,48 @@
+Implementation Description
+This solution leverages Node.js streams to efficiently read, 
+process, and write large CSV files line-by-line without 
+loading the entire file into memory.
+
+CSVParser (Transform Stream): Buffers incoming data chunks, 
+splits them by lines (safely handling partial chunks), 
+extracts the header row, and converts each subsequent CSV 
+record into a JavaScript object.
+
+DataTransformer (Transform Stream): Applies the required 
+formatting rules to individual fields using dedicated helper functions:
+
+capitalizeName: Capitalizes the first and last names 
+(including hyphenated combinations).
+
+normalizeEmail: Converts emails to lowercase and validates 
+them against standard patterns.
+
+formatPhone: Sanitizes digits and formats valid 10-digit 
+numbers into (XXX) XXX-XXXX or flags them as INVALID.
+
+standardizeDate: Parses different date inputs and outputs 
+them uniformly in YYYY-MM-DD format.
+
+CSVWriter (Transform Stream): Reconstructs the transformed 
+JavaScript objects back into clean CSV strings, handling 
+edge cases like quotes or commas, and prepends the header 
+row on the first output.
+
+Pipeline Integration: Uses stream/promises (pipeline) to 
+cleanly connect the read stream, transformations, and write 
+stream while handling errors automatically.
+
+
+How to Run the solution:
+Change the flag at the bottom from false to true
+const isReadyToTest = true;
+
+node task-02.js
+
+This will automatically generate the data/ directory, 
+create the sample input file, perform the transformation 
+stream pipeline, and output the result to data/users_transformed.csv.
+
+To test the automated test suite:
+
+node task-02-test.js
