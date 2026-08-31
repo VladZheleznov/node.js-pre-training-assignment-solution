@@ -1,0 +1,51 @@
+Implementation Description
+This solution implements a robust, dependency-free RESTful API server built 
+entirely with Node.js's built-in http and url modules.
+
+Key highlights of the implementation include:
+
+TodoServer Class Architecture: Encapsulates server configuration, sample 
+state initialization, request routing, and CRUD handling.
+
+Asynchronous Body Parsing (parseBody): Reads incoming request streams 
+chunk-by-chunk, handles encoding safely, and gracefully catches malformed 
+JSON payloads, rejecting with an appropriate error.
+
+Manual URL Parsing & Routing: Extracts path parameters dynamically (such 
+as parsing :id out of /todos/:id), handles query strings (e.g., filtering 
+by ?completed=true), and manages CORS preflight requests (OPTIONS).
+
+Data Validation & Error Handling: Validates incoming title, description, 
+and completed fields against strict business rules (length bounds, 
+whitespace checks, type validation), returning clear and consistent 
+JSON error payloads with correct HTTP status codes (200, 201, 400, 404, 405, 500).
+
+
+How to Run the solution:
+Change the flag at the bottom from false to true
+const isReadyToTest = true;
+
+node task-04.js
+
+To test the automated test suite:
+
+node task-04-test.js
+
+To test manually using curl:
+
+node task-04.js
+
+# Get all todos
+curl http://localhost:3000/todos
+
+# Filter completed todos
+curl "http://localhost:3000/todos?completed=true"
+
+# Create a new todo
+curl -X POST http://localhost:3000/todos -H "Content-Type: application/json" -d '{"title":"Learn Node.js HTTP Module","description":"Build a REST API without external libraries"}'
+
+# Update an existing todo
+curl -X PUT http://localhost:3000/todos/1 -H "Content-Type: application/json" -d '{"completed":true}'
+
+# Delete a todo
+curl -X DELETE http://localhost:3000/todos/1
