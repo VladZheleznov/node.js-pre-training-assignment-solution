@@ -1,0 +1,35 @@
+Implementation Description
+This module provides a comprehensive exploration of the Node.js 
+event loop mechanics, async flow control, and debugging 
+strategies for common asynchronous antipatterns.
+
+Event Loop Analysis (analyzeEventLoop & predictExecutionOrder): 
+Breaks down the 6 phases of the Node.js event loop (Timers, 
+Pending Callbacks, Idle/Prepare, Poll, Check, and Close Callbacks) 
+alongside microtask prioritization (process.nextTick vs. Promises).
+
+Race Condition Resolution (fixRaceCondition): Eliminates race 
+conditions when processing multiple files concurrently using 
+Promise.all and robust error handling (ENOENT checks).
+
+Callback Hell Refactoring (fixCallbackHell): Converts deeply 
+nested callbacks into clean, sequential, and parallelizable 
+async/await flows with JSON.parse safety checks.
+
+Mixed Promises & Callbacks Fix (fixMixedAsync): Harmonizes 
+inconsistent asynchronous flows into a modern async/await 
+standard with error propagation.
+
+Event Loop Demonstration (demonstrateEventLoop): Digitally 
+demonstrates how different tasks and microtasks queue and execute across phases.
+
+
+How to Run the solution:
+Change the flag at the bottom from false to true
+const isReadyToTest = true;
+
+node task-03.js
+
+To test the automated test suite:
+
+node task-03-test.js
