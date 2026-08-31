@@ -1,5 +1,4 @@
-const EventEmitter = require("events");
-
+const EventEmitter = require('events');
 /**
  * Custom Event Emitter for a messaging system
  * Extend Node.js EventEmitter to create a pub-sub messaging system
@@ -26,7 +25,26 @@ class MessageSystem extends EventEmitter {
    * @param {string} sender - Optional sender name
    * @returns {object} Created message object
    */
-  sendMessage(type, content, sender = "System") {}
+  sendMessage(type, content, sender = 'System') {
+    const message = {
+      id: this.messageId++,
+      type,
+      content,
+      timestamp: new Date(),
+      sender,
+    };
+
+    this.messages.push(message);
+
+    if (this.messages.length > 100) {
+      this.messages.shift();
+    }
+
+    this.emit('message', message);
+    this.emit(type, message);
+
+    return message;
+  }
 
   /**
    * Subscribe to all message types
@@ -35,7 +53,9 @@ class MessageSystem extends EventEmitter {
    *
    * @param {function} callback - Callback function to handle messages
    */
-  subscribeToMessages(callback) {}
+  subscribeToMessages(callback) {
+    this.on('message', callback);
+  }
 
   /**
    * Subscribe to specific message type
@@ -45,7 +65,9 @@ class MessageSystem extends EventEmitter {
    * @param {string} type - Message type to subscribe to
    * @param {function} callback - Callback function to handle messages
    */
-  subscribeToType(type, callback) {}
+  subscribeToType(type, callback) {
+    this.on(type, callback);
+  }
 
   /**
    * Get current number of active users
@@ -54,7 +76,9 @@ class MessageSystem extends EventEmitter {
    *
    * @returns {number} Number of active users
    */
-  getUserCount() {}
+  getUserCount() {
+    return this.users.size;
+  }
 
   /**
    * Get the last N messages (default 10)
@@ -64,7 +88,9 @@ class MessageSystem extends EventEmitter {
    * @param {number} count - Number of messages to retrieve
    * @returns {array} Array of recent messages
    */
-  getMessageHistory(count = 10) {}
+  getMessageHistory(count = 10) {
+    return this.messages.slice(-count);
+  }
 
   /**
    * Add a user to the system
@@ -74,7 +100,13 @@ class MessageSystem extends EventEmitter {
    *
    * @param {string} username - Username to add
    */
-  addUser(username) {}
+  addUser(username) {
+    // if (this.users.has(username)) {
+    //   throw new Error(`User ${username} already exists`);
+    // }
+    this.users.add(username);
+    this.emit('user-joined', { content: `${username} joined the system` });
+  }
 
   /**
    * Remove a user from the system
@@ -84,7 +116,13 @@ class MessageSystem extends EventEmitter {
    *
    * @param {string} username - Username to remove
    */
-  removeUser(username) {}
+  removeUser(username) {
+    if (!this.users.has(username)) {
+      throw new Error(`User ${username} does not exist`);
+    }
+    this.users.delete(username);
+    this.emit('user-left', { content: `${username} left the system` });
+  }
 
   /**
    * Get all active users
@@ -93,7 +131,9 @@ class MessageSystem extends EventEmitter {
    *
    * @returns {array} Array of usernames
    */
-  getActiveUsers() {}
+  getActiveUsers() {
+    return Array.from(this.users);
+  }
 
   /**
    * Clear all messages
@@ -101,7 +141,10 @@ class MessageSystem extends EventEmitter {
    * Clear messages array
    * Emit history-cleared event
    */
-  clearHistory() {}
+  clearHistory() {
+    this.messages = [];
+    this.emit('history-cleared', { content: 'Message history cleared' });
+  }
 
   /**
    * Get system statistics
@@ -110,7 +153,16 @@ class MessageSystem extends EventEmitter {
    *
    * @returns {object} System stats
    */
-  getStats() {}
+  getStats() {
+    return {
+      activeUsers: this.getUserCount(),
+      totalMessages: this.messages.length,
+      messagesByType: this.messages.reduce((acc, msg) => {
+        acc[msg.type] = (acc[msg.type] || 0) + 1;
+        return acc;
+      }, {}),
+    };
+  }
 }
 
 // Export the MessageSystem class
@@ -128,33 +180,33 @@ if (isReadyToTest) {
   });
 
   // Subscribe to specific alert messages
-  messenger.subscribeToType("alert", (message) => {
+  messenger.subscribeToType('alert', (message) => {
     console.log(`🚨 ALERT: ${message.content}`);
   });
 
   // Subscribe to user events
-  messenger.subscribeToType("user-joined", (message) => {
+  messenger.subscribeToType('user-joined', (message) => {
     console.log(`👋 ${message.content}`);
   });
 
-  messenger.subscribeToType("user-left", (message) => {
+  messenger.subscribeToType('user-left', (message) => {
     console.log(`👋 ${message.content}`);
   });
 
   // Add users
-  messenger.addUser("Alice");
-  messenger.addUser("Bob");
+  messenger.addUser('Alice');
+  messenger.addUser('Bob');
 
   // Send various messages
-  messenger.sendMessage("message", "Hello everyone!", "Alice");
-  messenger.sendMessage("notification", "System maintenance in 1 hour");
-  messenger.sendMessage("alert", "Server overload detected!");
+  messenger.sendMessage('message', 'Hello everyone!', 'Alice');
+  messenger.sendMessage('notification', 'System maintenance in 1 hour');
+  messenger.sendMessage('alert', 'Server overload detected!');
 
   // Remove user
-  messenger.removeUser("Bob");
+  messenger.removeUser('Bob');
 
   // Check system status
   console.log(`\nActive users: ${messenger.getUserCount()}`);
-  console.log("Recent messages:", messenger.getMessageHistory()?.length);
-  console.log("System stats:", messenger.getStats());
+  console.log('Recent messages:', messenger.getMessageHistory()?.length);
+  console.log('System stats:', messenger.getStats());
 }

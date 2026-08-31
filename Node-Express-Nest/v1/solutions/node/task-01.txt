@@ -1,0 +1,29 @@
+Implementation Description
+The MessageSystem class extends the built-in Node.js 
+EventEmitter to create a decoupled publish-subscribe 
+architecture. Key aspects of the implementation include:
+
+Event-Driven Architecture: Utilizes Node.js event emitter 
+capabilities to broadcast general messages and type-specific 
+events (message, notification, alert, user-joined, user-left).
+
+User Management: Maintains an active user registry via a 
+JavaScript Set to prevent duplicate entries and track membership dynamically.
+
+Memory Management: Stores messages in a rolling array 
+capped at 100 entries to prevent excessive memory consumption over time.
+
+Observability & Telemetry: Provides built-in system 
+inspection tools including active user counts, a history 
+log (getMessageHistory), and aggregated statistics (getStats).
+
+
+How to Run the solution:
+Change the flag at the bottom from false to true
+const isReadyToTest = true;
+
+node task-01.js
+
+To test the automated test suite:
+
+node task-01-test.js
