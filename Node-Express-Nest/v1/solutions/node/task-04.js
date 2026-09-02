@@ -342,10 +342,19 @@ class TodoServer {
     // 2. Apply completed filter if provided in query
     // 3. Return success response with data and count
     // 4. Handle query parameter validation
-    let todos = this.todos;
+    let todos = [...this.todos];
 
     if ('completed' in query && query.completed !== undefined) {
-      const completed = query.completed === 'true';
+      const isCompleted = query.completed;
+
+      if (isCompleted !== 'true' && isCompleted !== 'false') {
+        return sendResponse(res, 400, {
+          success: false,
+          error: `'completed' must be 'true' of 'false'`,
+        });
+      }
+
+      const completed = isCompleted === 'true';
       todos = todos.filter((todo) => todo.completed === completed);
     }
 
