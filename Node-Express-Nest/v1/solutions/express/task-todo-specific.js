@@ -7,6 +7,33 @@ const PORT = 4000;
 
 app.use(express.json());
 
+const metrics = {
+  totalRequests: 0,
+  totalResponseTime: 0,
+  statusCount: {},
+};
+
+app.use((req, res, next) => {
+  if (req.url === '/metrics') {
+    return next();
+  }
+
+  metrics.totalRequests++;
+
+  const start = Date.now();
+
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    metrics.totalResponseTime += duration;
+
+    const status = res.statusCode;
+    metrics.statusCount[status] = (metrics.statusCount[status] || 0) + 1;
+  });
+  next();
+});
+
 const validateTodoTitle = (req, res, next) => {
   const title = req.body.title;
 
@@ -82,6 +109,19 @@ app.delete('/todos/:id', (req, res) => {
   }
 
   res.status(204).send();
+});
+
+app.get('/metrics', (req, res) => {
+  const averageResponseTime =
+    metrics.totalRequests > 0
+      ? (metrics.totalResponseTime / metrics.totalRequests).toFixed(2)
+      : 0;
+
+  res.json({
+    totalRequests: metrics.totalRequests,
+    averageResponseTime: Number(averageResponseTime),
+    statusCodes: metrics.statusCount,
+  });
 });
 
 app.listen(PORT, () => {
