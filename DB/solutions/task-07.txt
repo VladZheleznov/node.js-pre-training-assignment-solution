@@ -1,0 +1,22 @@
+Configuring the `data-source.ts` file to connect TypeORM 
+to a PostgreSQL database.
+
+Using environment variables (`.env`) to securely store 
+database credentials.
+
+Creating the User entity (fields: id, name, email, 
+createdAt, and a one-to-many relationship with todos).
+
+Creating the Todo entity (fields: id, title, description, 
+status, and a many-to-one relationship with the user).
+
+Configuring cascading deletion ({ onDelete: 'CASCADE' }) 
+so that todos associated with a user are automatically 
+deleted when the user is deleted.
+
+Creating and using migrations to create tables and modify 
+the database schema without data loss.
+
+Writing a script to populate the database with test users 
+and todos using related entities.
+
