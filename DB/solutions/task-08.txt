@@ -1,0 +1,21 @@
+Create (createTodo): Implemented entity generation and 
+persistence using create() and save(), utilizing the 
+{ id: 1 } optimization to bind the foreign key without 
+an extra database lookup.
+
+Read (getTodos): Configured data retrieval with find() 
+to fetch all records and filter by status (active), using 
+TypeORM's modern object syntax for relations (relations: { user: true }).
+
+Update (updateTodo): Used the direct repository update() 
+method to modify task fields efficiently by ID.
+
+Delete (remove): Implemented safe removal in removeTodo 
+by first checking for the record's existence, throwing 
+an explicit error if missing, and using remove() to 
+respect ORM lifecycle logic.
+
+Issues:
+Discovered that omitting relations left related objects 
+as undefined, and single-direction relation fetching left 
+nested arrays (like user.todos) empty.
