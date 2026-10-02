@@ -1,0 +1,13 @@
+#Started Redis via Docker.
+
+Implemented the Cache-Aside pattern for fetching 
+user to-do lists, checking Redis first before 
+falling back to PostgreSQL and caching results with 
+a 5-minute TTL.
+
+Set up cache clearing mechanisms upon creating, 
+updating, or deleting todos to ensure data consistency.
+
+Added a test routine using a short expiration time (10 seconds) 
+to explicitly prove that cached data automatically expires 
+and triggers a cache miss after the TTL period passes.
