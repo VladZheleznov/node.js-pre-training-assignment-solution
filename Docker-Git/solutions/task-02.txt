@@ -1,0 +1,60 @@
+#Create and switch to new branch called feature/add-scripts
+git checkout -b feature/add-scripts
+
+#Check current list of local branches
+git branch -a
+* feature/add-scripts
+  master
+
+#Add a scripts section to package.json
+#Stage and commit changes on the feature branch
+git add package.json
+git commit -m "feat: add start, dev and test scripts"
+
+#Switch back to master branch
+git checkout master
+
+Observation: If we open package.json while on 
+the master branch, we will notice that the scripts 
+section is missing. This happens because those 
+changes only exist inside the feature/add-scripts branch.
+
+#Check current list of local branches
+git branch -a
+  feature/add-scripts
+* master
+
+#Create another branch called feature/add-dependencies from main
+git checkout -b feature/add-dependencies
+
+#Check current list of local branches
+git branch -a
+* feature/add-dependencies
+  feature/add-scripts
+  master
+
+#Switch to master branch
+git checkout master
+
+#Merge the feature/add-scripts branch
+git merge feature/add-scripts
+
+#Check current list of local branches
+git branch -a
+  feature/add-dependencies
+  feature/add-scripts
+* master
+
+#Delete the merged branch
+git branch -d feature/add-scripts
+
+#Check current list of local branches
+git branch -a
+  feature/add-dependencies
+* master
+
+#Check commit history
+git log --graph --oneline
+* 56032c4 (HEAD -> master) feat: add start, dev and test scripts
+* 604b1a2 (feature/add-dependencies) feat: add README and package.json
+* 36d11f4 chore: add gitignore
