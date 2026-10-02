@@ -1,0 +1,25 @@
+#Create a new directory called my-first-repo
+mkdir my-first-repo
+
+#Switch to this directory
+cd my-first-repo
+
+#Initialize as a Git repository
+git init
+
+#Configure my name and email for this repository
+git config user.name "Vlad"
+git config user.email "trewvlad8@gmail.com"
+
+#Stage and commit the .gitignore file
+git add .gitignore
+git commit -m "chore: add gitignore"
+
+#Stage and commit README.md and package.json
+git add .
+git commit -m "feat: add README and package.json"
+
+#Check commit history
+git log --oneline
+604b1a2 (HEAD -> master) feat: add README and package.json
+36d11f4 chore: add gitignore
