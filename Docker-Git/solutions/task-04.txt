@@ -1,0 +1,34 @@
+# Git commands:
+
+git checkout -b feature/update-readme-v1
+git add .
+git commit -m "docs: update README"
+git checkout main
+git checkout -b feature/update-readme-v2
+git add .
+git commit -m "docs: update README"
+git checkout main
+git merge feature/update-readme-v1
+git merge feature/update-readme-v2
+
+
+# Content of the conflict markers
+<<<<<< HEAD
+My Awesome Project v1
+=======
+My Super Project v2
+>>>>>> feature/update-readme-v2
+
+# How the conflict was resolved:
+
+Combined both titles creatively into a single header:
+My Awesome and Super Project (v1,v2)
+Removed conflict markers, saved the file, 
+added it to staging, and completed the merge.
+
+
+git add README.md
+git commit -m "merge: resolve conflict in README by combining v1 and v2 titles"
+
+# Final commit message for the merge
+merge: resolve conflict in README by combining v1 and v2 titles
