@@ -1,0 +1,57 @@
+# Dockerfile.single:
+FROM node:24-alpine
+WORKDIR /app
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm install
+RUN npm run build
+EXPOSE 3000
+CMD [ "npm", "start" ]
+
+
+# Dockerfile.multi:
+FROM node:24 AS builder
+WORKDIR /app
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm install
+RUN npm run build
+
+FROM node:24-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY --from=builder /app/dist ./dist
+EXPOSE 3000
+CMD [ "node", "dist/index.js" ]
+
+
+# .dockerignore:
+node_modules
+dist
+npm-debug.log
+Dockerfile*
+.dockerignore
+.git
+.gitignore
+.vscode
+.env
+
+
+docker images ts-app
+IMAGE           ID             DISK USAGE   CONTENT SIZE   EXTRA
+ts-app:multi    6269e57579f4        253MB         63.6MB        
+ts-app:single   736b1361130d        320MB         84.8MB        
+
+
+docker build -f Dockerfile.single -t ts-app:single .
+docker build -f Dockerfile.multi -t ts-app:multi .
+docker run -d --name ts-app-container -p 3000:3000 ts-app:single
+curl http://localhost:3000
+Hello Docker!
+docker stop ts-app-container
+docker run -d --name ts-app-containermulti -p 3000:3000 ts-app:multi
+curl http://localhost:3000
+Hello Docker!
