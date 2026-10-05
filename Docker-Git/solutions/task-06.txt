@@ -1,0 +1,66 @@
+git checkout -b feature/user-authentication
+
+git add auth.js
+git commit -m "feat: add initial auth structure"
+
+git add package.json
+git commit -m "chore: add express, dotenv and jsonwebtoken to dependencies"
+
+git add middleware.js
+git commit -m "feat: add auth middleware"
+
+git add middleware.js
+git commit -m "fix typo"
+
+git add auth.test.json
+git commit -m "feat: add auth middleware"
+
+git log --oneline
+8d99164 (HEAD -> feature/user-authentication) feat: add unit tests
+6126b32 fix typo
+14f5366 feat: add auth middleware
+76a8da0 chore: add express, dotenv and jsonwebtoken to dependencies
+0ca7d59 feat: add initial auth structure
+
+git rebase -i HEAD~5
+# changed pick to squash 6126b32 fix typo and combined the commit messages
+
+git log --oneline
+54a2915 (HEAD -> feature/user-authentication) feat: add unit tests
+fdf7db3 feat: add auth middleware and fix typo
+76a8da0 chore: add express, dotenv and jsonwebtoken to dependencies
+0ca7d59 feat: add initial auth structure
+
+git checkout main
+
+git add README.md
+git commit -m "docs: update README by other developer"
+
+git checkout feature/user-authentication
+git rebase main
+
+git log --oneline
+6c63ccf (HEAD -> feature/user-authentication) feat: add unit tests
+3e4f2e8 feat: add auth middleware and fix typo
+f285a23 chore: add express, dotenv and jsonwebtoken to dependencies
+47cb049 feat: add initial auth structure
+adc9658 (main) docs: update README by other developer
+
+git checkout -b test-merge
+git add index.js
+git commit -m "feat: add test file for merge"
+
+git checkout main
+git merge test-merge
+
+git log --oneline
+43d8f87 (HEAD -> main, test-merge) feat: add test file for merge
+adc9658 docs: update README by other developer
+
+
+# Rebase is used strictly locally to clean up history, 
+whereas merge is used to integrate code into shared team branches.
+
+
+# I forgot to check git log before rebasing, 
+so I had to use git reset --hard to rollback.
