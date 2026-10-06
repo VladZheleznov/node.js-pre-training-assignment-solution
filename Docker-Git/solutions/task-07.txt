@@ -1,0 +1,83 @@
+# docker-compose.yml:
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgres://user:user123@postgres:5432/pgdatabase
+    depends_on:
+      - postgres
+    networks:
+      - service-net
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=user123
+      - POSTGRES_DB=pgdatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - service-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "5050:80"
+    networks:
+      - service-net
+
+volumes:
+  pgdata:
+
+networks:
+  service-net:
+    driver: bridge
+
+
+# Docker Compose commands used:
+
+docker compose up --build -d
+curl http://localhost:3000/health
+{"status":"UP","timestamp":"2026-10-06T14:56:50.400Z","database":"connected"}
+
+curl http://localhost:3000/data
+[
+   {"id":1,"name":"User","email":"user@example.com"},
+   {"id":2,"name":"Admin","email":"admin@example.com"},
+   {"id":3,"name":"Customer","email":"customer@example.com"}]
+
+docker compose logs api
+docker compose logs postgres
+docker compose logs pgadmin
+docker-compose ps
+NAME                                    IMAGE                            COMMAND                  SERVICE    CREATED          STATUS          PORTS
+multi-containerapplication-api-1        multi-containerapplication-api   "docker-entrypoint.s…"   api        12 minutes ago   Up 12 minutes   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+multi-containerapplication-pgadmin-1    dpage/pgadmin4                   "/entrypoint.sh"         pgadmin    12 minutes ago   Up 12 minutes   0.0.0.0:5050->80/tcp, [::]:5050->80/tcp
+multi-containerapplication-postgres-1   postgres:16                      "docker-entrypoint.s…"   postgres   12 minutes ago   Up 12 minutes   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+
+# URLs and credentials:
+
+api:
+   http://localhost:3000/health
+   http://localhost:3000/data
+
+pgadmin:
+   http://localhost:5050
+   email: admin@example.com
+   password: admin123
+
+postgres: 
+   Host name/address: postgres
+   Port: 5432
+   Maintenance database: pgpostgres
+   Username: user
+   Password: user123
