@@ -1,0 +1,64 @@
+# create company-repo
+git init -b main
+git add README.md
+git commit -m "chore: initial commit"
+
+# copy company-repo and rename to my-fork
+
+git clone my-fork my-local-workspace
+git remote add upstream D:/simulating-team-git-workflow/company-repo
+
+git remote -v
+origin  D:/simulating-team-git-workflow/my-fork (fetch)
+origin  D:/simulating-team-git-workflow/my-fork (push)
+upstream        D:/simulating-team-git-workflow/company-repo (fetch)
+upstream        D:/simulating-team-git-workflow/company-repo (push)
+
+git pull upstream main
+git checkout -b feature/user-authentication
+
+git add auth.js
+git commit -m "feat: add JWT-based user authentication"
+git commit -am "refactor: split JWT authentication into access and refresh tokens"
+
+git push -u origin feature/user-authentication
+cd ../company-repo
+git fetch ../my-fork feature/user-authentication:feature/user-authentication
+git merge feature/user-authentication
+git log --oneline
+1326b19 (HEAD -> main, feature/user-authentication) refactor: split JWT authentication into access and refresh tokens
+d9044f2 feat: add JWT-based user authentication
+27be821 chore: initial commit
+
+cd ../my-local-workspace
+
+git add auth.js
+git commit -m "fix: implement token validation function"
+
+git push origin feature/user-authentication --force-with-lease
+
+git checkout main
+git pull upstream main
+git push
+
+
+# Strategy for handling upstream changes
+
+ - Pull from upstream/main into your local main branch regularly
+ - Regularly rebase your branch onto the latest `main`
+ - Never write feature code directly on your local main branch. 
+   Always branch out (git checkout -b feature/...) so your main 
+   remains a pristine reflection of the upstream source
+ - Сlean up history before a pull request
+
+# Best practices for commit messages
+
+ - Use a clear structure (type: short summary):
+ "chore: initial commit"
+ "feat: add JWT-based user authentication"
+ "refactor: split JWT authentication into access and refresh tokens"
+ "fix: implement token validation function"
+
+ - Keep the imperative mood: 
+ Write descriptions as commands ("add function" 
+ instead of "added function" or "-ing function").
