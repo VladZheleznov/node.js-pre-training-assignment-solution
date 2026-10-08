@@ -1,0 +1,112 @@
+ # Pull images
+docker pull nginx:alpine
+docker pull redis:7-alpine
+docker pull node:24-alpine
+
+ # List images
+docker images
+
+ # Inspect images
+docker inspect nginx:alpine
+docker inspect redis:7-alpine
+docker inspect node:24-alpine
+
+ # Tag the nginx image
+docker tag nginx:alpine nginx:v1
+
+ # Save nginx image to a tar file and load it back
+docker save -o nginx.tar nginx:v1
+docker load -i nginx.tar
+
+ # Remove specific images and clean up unused images
+docker rmi nginx:v1
+docker image prune
+
+ # Run nginx container in detached mode with port mapping
+docker run -d -p 8080:80 --name web-server nginx:alpine
+
+ # Run redis container with custom name and restart policy
+docker run -d --name db-redis --restart unless-stopped redis:7-alpine
+
+ # Create a Node.js container without starting it
+docker create --name app-node node:24-alpine
+ # Start it manually
+docker start app-node
+
+ # Execute commands inside running containers
+docker exec -it web-server sh
+docker exec -it db-redis redis-cli
+
+ # Copy files between host and containers
+docker cp index.html web-server:/usr/share/nginx/html/
+docker cp web-server:/etc/nginx/nginx.conf ./nginx.conf
+
+ # Monitor container resource
+docker stats
+
+ # View and follow container logs with timestamps
+docker logs -f -t web-server
+
+ # Inspect container configuration
+docker inspect web-server
+
+ # Create and manage Docker volumes
+docker volume create app-data
+docker volume ls
+
+ # Network troubleshooting between containers
+docker network create custom-net
+docker network ls
+docker network connect custom-net web-server
+docker network inspect custom-net
+
+docker system df
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          10        3         2.133GB   1.752GB (82%)
+Containers      3         2         135.2kB   4.096kB (3%)
+Local Volumes   4         1         48.41MB   48.41MB (100%)
+Build Cache     41        0         2.034GB   1.686GB
+
+ # Stop all running containers
+docker stop $(docker ps -q)
+
+ # Remove containers, images, volumes, and networks
+docker container prune -f
+docker volume prune -f
+docker network prune -f
+
+ # System prune to clean up unused resources
+docker system prune -a --volumes
+
+ # Remove remaining volumes
+docker volume rm app-data multi-containerapplication_pgdata
+
+docker system df
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          0         0         0B        0B
+Containers      0         0         0B        0B
+Local Volumes   0         0         0B        0B
+Build Cache     0         0         0B        0B
+
+ # List of Docker commands you found most useful
+
+- docker run -d -p <host-port>:<container-port> --name <name> <image>
+Downloads the image (if missing), creates a 
+container, maps ports, names it, and runs it in the background in a single command
+
+- docker exec -it <container-name> bash (or sh)
+Lets you jump directly inside a running container to 
+troubleshoot, check file structures, or test commands
+
+- docker ps
+Shows what containers are currently running
+
+- docker stats
+showing how much CPU, memory, and network bandwidth each container is consuming
+
+- docker stop $(docker ps -q)
+A quick one-liner to instantly halt every single running container on your machine
+
+- docker system prune -a --volumes
+Clears out all stopped containers, unused networks, unused images, 
+and anonymous volumes to free up massive amounts of disk space
