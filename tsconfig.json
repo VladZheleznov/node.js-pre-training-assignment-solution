@@ -4,7 +4,9 @@
     "module": "CommonJS",
     "strict": true,
     "esModuleInterop": true,
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["JS-TS/**/*", "tests/**/*"]
 }
