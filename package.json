@@ -1,6 +1,7 @@
 {
   "name": "node.js-pre-training-pracrice",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "",
   "main": "index.js",
   "directories": {
@@ -15,7 +16,10 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write \"**/*.{ts,tsx,json,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d data-source.ts",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d data-source.ts"
   },
   "keywords": [],
   "author": "",
@@ -34,10 +38,19 @@
     "jiti": "^2.7.0",
     "prettier": "^3.9.5",
     "ts-jest": "^29.4.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.64.0"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "dotenv": "^18.0.2",
+    "express": "^5.1.0",
+    "ioredis": "^5.11.1",
+    "mongodb": "^7.7.0",
+    "pg": "^8.23.0",
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1",
+    "typeorm": "^1.1.1"
   },
   "allowScripts": {
     "unrs-resolver@1.12.2": true
