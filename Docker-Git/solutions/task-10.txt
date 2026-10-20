@@ -1,0 +1,141 @@
+docker network create app-network
+docker network create --subnet=172.28.0.0/16 subnet-network
+docker network ls
+NETWORK ID     NAME             DRIVER    SCOPE
+6a9174810e01   app-network      bridge    local
+c1a7e0a9382b   bridge           bridge    local
+524169c9e7ec   host             host      local
+f29f9cc8a87a   none             null      local
+ca48aba6de90   subnet-network   bridge    local
+
+docker network inspect app-network
+
+docker run -d --name container1 --net app-network alpine sleep 3600
+docker run -d --name container2 --net app-network alpine sleep 3600
+
+docker exec -it container1 ping -c 3 container2
+PING container2 (172.18.0.3): 56 data bytes
+64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.366 ms
+64 bytes from 172.18.0.3: seq=1 ttl=64 time=0.173 ms
+64 bytes from 172.18.0.3: seq=2 ttl=64 time=0.179 ms
+
+--- container2 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.173/0.239/0.366 ms
+
+docker rm -f container1 container2
+
+docker volume create mongo-data
+
+docker run -d \
+  --name mongodb \
+  --net app-network \
+  -v mongo-data:/data/db \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=admin123 \
+  mongo
+
+
+docker run -d \
+  --name mongo-express \
+  --net app-network \
+  -p 8081:8081 \
+  -e ME_CONFIG_MONGODB_SERVER=mongodb \
+  -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin \
+  -e ME_CONFIG_MONGODB_ADMINPASSWORD=admin123 \
+  -e ME_CONFIG_BASICAUTH_USERNAME=admin \
+  -e ME_CONFIG_BASICAUTH_PASSWORD=admin123 \
+  mongo-express
+
+docker run --name node-app \
+  --network app-network \
+  -v $(pwd):/app \
+  -w /app node:24-alpine \
+  sh -c "npm install && node server.js"
+
+docker exec -it mongodb \
+  mongosh exampledb \
+  -u admin \
+  -p admin123 \
+  --authenticationDatabase admin \
+  --eval "db.logs.find().pretty()"
+[
+  {
+    _id: ObjectId('6ad745588f2c2f4e8c8420f0'),
+    message: 'Hello from Node.js!',
+    timestamp: ISODate('2026-10-20T10:41:28.882Z')
+  }
+]
+
+docker run -d --name temp-container --network app-network --tmpfs /app/temp nginx:alpine
+
+docker stop mongodb
+docker rm mongodb
+docker run -d --name mongodb --net app-network -v mongo-data:/data/db mongo
+
+docker network create second-net
+docker network create third-net
+
+docker run -d --name secondnet-container --net second-net alpine sleep 3600
+docker run -d --name thirdnet-container --net third-net alpine sleep 3600
+
+docker exec -it secondnet-container ping -c 3 thirdnet-container
+ping: bad address 'thirdnet-container'
+
+docker network connect third-net secondnet-container
+
+docker exec -it secondnet-container ping -c 3 thirdnet-container
+PING thirdnet-container (172.20.0.2): 56 data bytes
+64 bytes from 172.20.0.2: seq=0 ttl=64 time=0.546 ms
+64 bytes from 172.20.0.2: seq=1 ttl=64 time=0.229 ms
+64 bytes from 172.20.0.2: seq=2 ttl=64 time=0.161 ms
+
+--- thirdnet-container ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 0.161/0.312/0.546 ms
+
+docker network ls
+NETWORK ID     NAME             DRIVER    SCOPE
+6a9174810e01   app-network      bridge    local
+4bd5ca709a60   bridge           bridge    local
+524169c9e7ec   host             host      local
+f29f9cc8a87a   none             null      local
+5a4fd28aba78   second-net       bridge    local
+ca48aba6de90   subnet-network   bridge    local
+0f10d68b0f3e   third-net        bridge    local
+
+docker volume ls
+DRIVER    VOLUME NAME
+local     6c3cc0943429ef04a893aaae9bd6b66ed9179e4a34d5ceb6666082a61658ea22
+local     c3beb5249fe6fd7c7a50104a69c9f51f7d28d0ad13958ce86fea89c12b8be262
+local     mongo-data
+
+
+ # Network topology diagram
+
+NETWORK: app-network
+- mongodb (Database, port 27017)
+- mongo-express (Web UI, port 8081, connects to mongodb by service name)
+- node-app (Client application, connects to mongodb by service name)
+
+NETWORK: second-net
+- secondnet-container
+
+NETWORK: third-net
+- thirdnet-container
+
+* Isolation exists between secondnet-container and 
+  thirdnet-container (no direct communication)
+  
+* After running 'docker network connect third-net secondnet-container', 
+  communication becomes possible
+
+ # Explanation of different volume types used
+
+ -- Named volumes - production databases (e.g., MongoDB data files). 
+    Safe when containers are deleted.
+
+ -- Bind mounts - local development. Real-time code 
+    synchronization between host editor and container.
+ 
+ -- Tmpfs mounts - high-performance temporary caching, logging sensitive credentials.
